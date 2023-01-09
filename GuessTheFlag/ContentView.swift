@@ -14,21 +14,38 @@ struct ContentView: View {
     @State private var showingScore = false
     @State private var scoreTitle = ""
     
+    @State private var totalScore = 0
+    
+    @State private var topCount = 0
+    @State private var fullCount = false
+    
+    func resetGame() {
+        totalScore = 0
+        topCount = 0
+        askQuestion()
+    }
+    
     func flagTapped(_ number: Int) {
         if number == correctAnswer {
-            scoreTitle = "Correct"
+            scoreTitle = "Correct!"
+            totalScore += 10
         } else {
-            scoreTitle = "Wrong"
+            scoreTitle = "Wrong! That's the flag of \(countries[number])"
         }
         
-        showingScore = true
+        topCount += 1
+        if topCount >= 8 {
+            fullCount = true
+        } else {
+            showingScore = true
+        }
+        
     }
     
     func askQuestion() {
         countries.shuffle()
         correctAnswer = Int.random(in: 0...2)
     }
-
     
     
     var body: some View {
@@ -37,7 +54,7 @@ struct ContentView: View {
                 .init(color: Color(red: 0.1, green: 0.2, blue: 0.45), location: 0.3),
                 .init(color: Color(red: 0.76, green: 0.15, blue: 0.26), location: 0.3),
             ], center: .top, startRadius: 200, endRadius: 400)
-                .ignoresSafeArea()
+            .ignoresSafeArea()
             
             
             VStack {
@@ -64,20 +81,18 @@ struct ContentView: View {
                                     .renderingMode(.original)
                                     .clipShape(Capsule())
                                     .shadow(radius: 5)
-                                    
+                                
                             }
-                            
                         }
                     }
-                
                 }
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 20)
                 .background(.regularMaterial)
-            .clipShape(RoundedRectangle(cornerRadius: 20))
+                .clipShape(RoundedRectangle(cornerRadius: 20))
                 Spacer()
                 Spacer()
-                Text("Score: ???")
+                Text("Score: \(totalScore)")
                     .foregroundColor(.white)
                     .font(.title.bold())
                 Spacer()
@@ -88,10 +103,14 @@ struct ContentView: View {
         .alert(scoreTitle, isPresented: $showingScore) {
             Button("Continue", action: askQuestion)
         } message: {
-            Text("Your score is ???")
+            Text("Your score is \(totalScore)")
         }
         
-        
+        .alert("End of Game! Your score: \(totalScore)", isPresented: $fullCount) {
+            Button("Done", action: resetGame)
+        } message: {
+            Text("Game will be reset")
+        }
         
     }
 }
