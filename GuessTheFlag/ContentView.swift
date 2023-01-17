@@ -7,6 +7,20 @@
 
 import SwiftUI
 
+struct Title: ViewModifier {
+    func body(content: Content) -> some View {
+        content
+            .font(.largeTitle.weight(.heavy))
+            .foregroundColor(.cyan)
+            .padding()
+    }
+}
+extension View {
+    func titleStyle() -> some View {
+        modifier(Title())
+    }
+}
+
 struct ContentView: View {
     @State private var countries = ["Estonia", "France", "Germany", "Ireland", "Italy", "Nigeria", "Poland", "Russia", "Spain", "UK", "US"].shuffled()
     @State private var correctAnswer = Int.random(in: 0...2)
@@ -18,6 +32,30 @@ struct ContentView: View {
     
     @State private var topCount = 0
     @State private var fullCount = false
+    
+    var FlagImage: some View {
+        VStack {
+            Text("Tap the flag of")
+                .foregroundColor(.white)
+                .font(.subheadline.weight(.heavy))
+            Text(countries[correctAnswer])
+                .foregroundStyle(.secondary)
+                .font(.largeTitle.weight(.semibold))
+            
+            ForEach(0..<3) { number in
+                Button {
+                    // flag was tapped
+                    flagTapped(number)
+                } label: {
+                    Image(countries[number])
+                        .renderingMode(.original)
+                        .clipShape(Capsule())
+                        .shadow(radius: 5)
+                    
+                }
+            }
+        }
+    }
     
     func resetGame() {
         totalScore = 0
@@ -48,6 +86,8 @@ struct ContentView: View {
     }
     
     
+    
+    
     var body: some View {
         ZStack {
             RadialGradient(stops: [
@@ -60,31 +100,9 @@ struct ContentView: View {
             VStack {
                 Spacer()
                 Text("Guess the Flag")
-                    .font(.largeTitle.weight(.bold))
-                    .foregroundColor(.white)
-                    .padding()
+                    .titleStyle()
                 VStack(spacing: 15) {
-                    VStack {
-                        Text("Tap the flag of")
-                            .foregroundColor(.white)
-                            .font(.subheadline.weight(.heavy))
-                        Text(countries[correctAnswer])
-                            .foregroundStyle(.secondary)
-                            .font(.largeTitle.weight(.semibold))
-                        
-                        ForEach(0..<3) { number in
-                            Button {
-                                // flag was tapped
-                                flagTapped(number)
-                            } label: {
-                                Image(countries[number])
-                                    .renderingMode(.original)
-                                    .clipShape(Capsule())
-                                    .shadow(radius: 5)
-                                
-                            }
-                        }
-                    }
+                    FlagImage
                 }
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 20)
